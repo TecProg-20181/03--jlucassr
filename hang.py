@@ -2,6 +2,7 @@ import random
 import string
 
 WORDLIST_FILENAME = "words.txt"
+NUMBER_GUESSES = 8
 
 def loadWords():
 
@@ -20,9 +21,10 @@ def loadWords():
     return random.choice(wordlist)
 
 
-def isWordGuessed(secretWord, lettersGuessed):
-    secretLetters = []
 
+def isWordGuessed(secretWord, lettersGuessed):
+
+#    secretLetters = []
 #    for letter in secretWord:
 #        if letter in secretLetters:
 #            secretLetters.append(letter)
@@ -48,21 +50,25 @@ def getAvailableLetters():
     available = string.ascii_lowercase
     return available
 
+def updateAvailableLetter(available, lettersGuessed):
+    for letter in lettersGuessed:
+        available = available.replace (letter, '')
+    return available
+
 def hangman(secretWord):
 
-    guesses = 8
+    guesses = NUMBER_GUESSES
     lettersGuessed = []
-    print 'Welcome to the game, Hangam!'
-    print 'I am thinking of a word that is', len(secretWord), ' letters long.'
+    print 'Welcome to the game, Hangmam!'
+    print 'I am thinking of a word that is', len(secretWord) ,' letters long.'
     print '-------------'
+
 
     while isWordGuessed(secretWord, lettersGuessed) is False and guesses > 0:
         print 'You have ', guesses, 'guesses left.'
 
         available = getAvailableLetters()
-        for letter in available:
-            if letter in lettersGuessed:
-                available = available.replace(letter, '')
+        available = updateAvailableLetter(available, lettersGuessed)
 
         print 'Available letters', available
         letter = raw_input('Please guess a letter: ')
@@ -92,7 +98,7 @@ def hangman(secretWord):
             print 'Good Guess: ', guessed
 
         else:
-            guesses -=1
+            guesses -= 1
             lettersGuessed.append(letter)
 
             guessed = getGuessedWord()
