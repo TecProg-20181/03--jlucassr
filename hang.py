@@ -46,31 +46,39 @@ def getAvailableLetters():
     available = string.ascii_lowercase
     return available
 
-    def validLetter(letter, lettersGuessed):
-        if letter in lettersGuessed:
-            return False
-        return True
+def validLetter(letter, lettersGuessed):
+    if letter in lettersGuessed:
+        return False
+    return True
 
 def updateAvailableLetter(available, lettersGuessed):
     for letter in lettersGuessed:
         available = available.replace (letter, '')
     return available
 
+def printSecretWord(secretWord, lettersGuessed):
+    word = ''
+    for letter in secretWord:
+        if letter in lettersGuessed:
+            word += letter
+        else:
+            word += '_'
+        print word
+
 def hangman(secretWord):
 
     guesses = NUMBER_GUESSES
     lettersGuessed = []
+
     print 'Welcome to the game, Hangmam!'
     print 'I am thinking of a word that is', len(secretWord) ,' letters long.'
     print '-------------'
 
+    word = printSecretWord(secretWord, lettersGuessed)
+    available = getAvailableLetters()
 
     while isWordGuessed(secretWord, lettersGuessed) is False and guesses > 0:
         print 'You have ', guesses, 'guesses left.'
-
-        available = getAvailableLetters()
-        available = updateAvailableLetter(available, lettersGuessed)
-
         print 'Available letters', available
         letter = raw_input('Please guess a letter: ')
 
@@ -78,15 +86,17 @@ def hangman(secretWord):
             if letter in secretWord:
                 print 'Good Guess: '
                 lettersGuessed.append(letter)
+                word = printSecretWord(secretWord, lettersGuessed)
 
             else:
                 guesses -= 1
                 lettersGuessed.append(letter)
-                print 'Oops! That letter is not in my word: ', guessed
-                print '------------'
+                print 'Oops! That letter is not in my word: ',
 
         else:
-                print 'Oops! You have already guessed that letter: ', guessed
+                print 'Oops! You have already guessed that letter: ',
+                printSecretWord(lettersGuessed, secretWord)
+                print '------------'
 
         if isWordGuessed(secretWord, lettersGuessed) is True:
             print 'Congratulations, you won!'
