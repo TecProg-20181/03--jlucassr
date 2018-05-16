@@ -1,6 +1,7 @@
 import random
 import string
 import os
+from fileError import *
 
 class HangmanGame(object):
     """ Class conatining variables and methods of HangmanGame
@@ -9,10 +10,17 @@ class HangmanGame(object):
 
     def __init__(self, file_name='', guesses=8):
 
+        self.guesses = guesses
         self.secretWord = ''
         self.loadWords(file_name)
         self.lettersGuessed = []
-        self.guesses = guesses
+
+
+    def checkDifferentLetters(self):
+        letters = set()
+        letters.update(self.secretWord)
+        print "The random word has been chosen and has ", len(letters), "different letters"
+        return len(letters)
 
 
     def loadWords(self,file_name):
@@ -21,11 +29,24 @@ class HangmanGame(object):
             take a while to finish.
         """
         print "Loading word list from file..."
-        inFile = open(file_name, 'r', 0)
-        line = inFile.readline()
-        wordlist = string.split(line)
+        try:
+            inFile = open(file_name, 'r', 0)
+            line = inFile.readline()
+            wordlist = string.split(line)
+            if len(wordlist) <= 0:
+                raise NoErrorFromWords(file_name)
+        except IOError:
+            print """
+                    FILE NOT FOUND.
+                    See https://github.com/TecProg-20181/03--jlucassr
+                    to find the respective files and put it on the same directory as hang.py and main.py"""
+        except NoErrorFromWords as e:
+            print e.message
         print "  ", len(wordlist), "words loaded."
         self.secretWord = random.choice(wordlist).lower()
+        while self.checkDifferentLetters() > self.guesses:
+            self.secretWord = random.choice(wordlist).lower()
+            print "This word is too big or too difficult, another word will be chosen!"
 
 
     def isWordGuessed(self):
@@ -73,9 +94,17 @@ class HangmanGame(object):
                 os.system('clear')
                 print 'Good Guess: '
 
+            elif len(letter) > 1:
+                os.system('clear')
+                print 'Guess Just One Letter, a syllable does not count!'
+
             elif letter in self.lettersGuessed:
                 os.system('clear')
-                print 'Oops! You have already guessed that letter '
+                print 'Oops! You have already guessed that letter!'
+
+            elif letter not in self.getAvailableLetters():
+                os.system('clear')
+                print 'Not a Letter, Just Try Again!'
 
             else:
                 self.guesses -= 1
