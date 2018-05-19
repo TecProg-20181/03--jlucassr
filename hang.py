@@ -1,7 +1,10 @@
 import random
 import string
 import os
+import logging
 from fileError import *
+
+logging.basicConfig(filename='hang.log', level=logging.DEBUG)
 
 class HangmanGame(object):
     """ Class conatining variables and methods of HangmanGame
@@ -17,10 +20,11 @@ class HangmanGame(object):
 
 
     def checkDifferentLetters(self):
-        letters = set()
-        letters.update(self.secretWord)
-        print "The random word has been chosen and has ", len(letters), "different letters"
-        return len(letters)
+        letters = set(self.secretWord)
+        differentLetters = len(letters)
+        print "The random word has been chosen and has ", differentLetters, "different letters"
+        logging.debug("Set: {0}\nWord: {1}\nLetters: {2}".format(self.secretWord, letters, differentLetters))
+        return differentLetters
 
 
     def loadWords(self,file_name):
@@ -54,7 +58,10 @@ class HangmanGame(object):
             if letter in self.lettersGuessed:
                 pass
             else:
+                logging.debug('{0} Not Guessed the Word'.format(letter))
                 return False
+            logging.debug('Congratulations, All the Letters has been Guessed!')
+            logging.debug('{0} : {1}'.format(self.secretWord, self.lettersGuessed))
             return True
 
 
@@ -64,6 +71,7 @@ class HangmanGame(object):
         for letter in available:
             if letter in self.lettersGuessed:
                 available = available.replace(letter, '')
+                logging.debug(available)
         return available
 
 
@@ -74,6 +82,7 @@ class HangmanGame(object):
                 word += letter
             else:
                 word += '_'
+                logging.debug('Already Guessed {0}'.format(word))
         return word
 
 
@@ -84,23 +93,23 @@ class HangmanGame(object):
         print '-------------'
 
         while self.isWordGuessed() is False and self.guesses > 0:
-            print 'You have ', self.guesses, 'guesses left.'
+            print 'You have', self.guesses, 'guesses left.'
             print 'Available letters', self.getAvailableLetters()
 
-            letter = raw_input('Please guess a letter: ')
+            letter = raw_input('Please Guess a Letter: ')
 
             if letter in self.secretWord:
                 self.lettersGuessed.append(letter)
                 os.system('clear')
                 print 'Good Guess: '
 
-            elif len(letter) > 1:
-                os.system('clear')
-                print 'Guess Just One Letter, a syllable does not count!'
-
             elif letter in self.lettersGuessed:
                 os.system('clear')
-                print 'Oops! You have already guessed that letter!'
+                print 'Oops! You Have Already Guessed That Letter!'
+
+            elif len(letter) > 1:
+                os.system('clear')
+                print 'Guess Just One Letter, a Syllable does Not Count!'
 
             elif letter not in self.getAvailableLetters():
                 os.system('clear')
@@ -110,7 +119,7 @@ class HangmanGame(object):
                 self.guesses -= 1
                 os.system('clear')
                 self.lettersGuessed.append(letter)
-                print 'Oops! That letter is not in my word \n',
+                print 'Oops! That letter is Not in My Word \n',
 
             print self.printSecretWord()
             print '------------ \n'
@@ -119,5 +128,5 @@ class HangmanGame(object):
         if self.isWordGuessed():
             print 'Congratulations, you won!'
         else:
-            print 'Sorry, you ran out of guesses. The word was ', self.secretWord, '.'
+            print 'Sorry, you ran out of guesses. The word was', self.secretWord, '.'
             print 'GAME OVER \n'
